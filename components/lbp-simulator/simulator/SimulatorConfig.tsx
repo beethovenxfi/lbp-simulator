@@ -400,39 +400,91 @@ function SimulatorConfigComponent() {
                   <div className="space-y-2">
                     <Label>Start (Token / {config.collateralToken})</Label>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-mono w-10 shrink-0">
-                        {config.tknWeightIn}%
-                      </span>
+                      <div className="flex items-center gap-1 w-14 shrink-0">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={localTknWeightIn}
+                          onChange={(e) => {
+                            const val = Math.max(
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
+                            );
+                            setLocalTknWeightIn(val);
+                          }}
+                          className="w-10 shrink-0 px-1 text-center"
+                        />
+                        <span className="text-sm text-muted-foreground">%</span>
+                      </div>
                       <Slider
                         value={[localTknWeightIn]}
-                        max={99}
-                        min={1}
+                        max={90}
+                        min={10}
                         step={1}
                         onValueChange={(vals) => handleWeightChange(vals[0])}
                         className="flex-1"
                       />
-                      <span className="text-sm font-mono w-10 shrink-0 text-right">
-                        {config.usdcWeightIn}%
-                      </span>
+                      <div className="flex items-center gap-1 w-14 shrink-0">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={100 - localTknWeightIn}
+                          onChange={(e) => {
+                            const val = Math.max(
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
+                            );
+                            setLocalTknWeightIn(100 - val);
+                          }}
+                          className="w-10 shrink-0 px-1 text-center"
+                        />
+                        <span className="text-sm text-muted-foreground">%</span>
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label>End (Token / {config.collateralToken})</Label>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-mono w-10 shrink-0">
-                        {config.tknWeightOut}%
-                      </span>
+                      <div className="flex items-center gap-1 w-14 shrink-0">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={localTknWeightOut}
+                          onChange={(e) => {
+                            const val = Math.max(
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
+                            );
+                            setLocalTknWeightOut(val);
+                          }}
+                          className="w-10 shrink-0 px-1 text-center"
+                        />
+                        <span className="text-sm text-muted-foreground">%</span>
+                      </div>
                       <Slider
                         value={[localTknWeightOut]}
-                        max={99}
-                        min={1}
+                        max={90}
+                        min={10}
                         step={1}
                         onValueChange={(vals) => handleEndWeightChange(vals[0])}
                         className="flex-1"
                       />
-                      <span className="text-sm font-mono w-10 shrink-0 text-right">
-                        {config.usdcWeightOut}%
-                      </span>
+                      <div className="flex items-center gap-1 w-14 shrink-0">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={100 - localTknWeightOut}
+                          onChange={(e) => {
+                            const val = Math.max(
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
+                            );
+                            setLocalTknWeightOut(100 - val);
+                          }}
+                          className="w-10 shrink-0 px-1 text-center"
+                        />
+                        <span className="text-sm text-muted-foreground">%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
