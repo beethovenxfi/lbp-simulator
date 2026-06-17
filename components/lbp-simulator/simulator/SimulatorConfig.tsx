@@ -407,8 +407,8 @@ function SimulatorConfigComponent() {
                           value={localTknWeightIn}
                           onChange={(e) => {
                             const val = Math.max(
-                              1,
-                              Math.min(99, parseInt(e.target.value) || 0),
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
                             );
                             setLocalTknWeightIn(val);
                           }}
@@ -418,8 +418,8 @@ function SimulatorConfigComponent() {
                       </div>
                       <Slider
                         value={[localTknWeightIn]}
-                        max={99}
-                        min={1}
+                        max={90}
+                        min={10}
                         step={1}
                         onValueChange={(vals) => handleWeightChange(vals[0])}
                         className="flex-1"
@@ -431,8 +431,8 @@ function SimulatorConfigComponent() {
                           value={100 - localTknWeightIn}
                           onChange={(e) => {
                             const val = Math.max(
-                              1,
-                              Math.min(99, parseInt(e.target.value) || 0),
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
                             );
                             setLocalTknWeightIn(100 - val);
                           }}
@@ -452,8 +452,8 @@ function SimulatorConfigComponent() {
                           value={localTknWeightOut}
                           onChange={(e) => {
                             const val = Math.max(
-                              1,
-                              Math.min(99, parseInt(e.target.value) || 0),
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
                             );
                             setLocalTknWeightOut(val);
                           }}
@@ -463,8 +463,8 @@ function SimulatorConfigComponent() {
                       </div>
                       <Slider
                         value={[localTknWeightOut]}
-                        max={99}
-                        min={1}
+                        max={90}
+                        min={10}
                         step={1}
                         onValueChange={(vals) => handleEndWeightChange(vals[0])}
                         className="flex-1"
@@ -476,8 +476,8 @@ function SimulatorConfigComponent() {
                           value={100 - localTknWeightOut}
                           onChange={(e) => {
                             const val = Math.max(
-                              1,
-                              Math.min(99, parseInt(e.target.value) || 0),
+                              10,
+                              Math.min(90, parseInt(e.target.value) || 0),
                             );
                             setLocalTknWeightOut(100 - val);
                           }}
