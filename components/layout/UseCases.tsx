@@ -156,7 +156,6 @@ const UseCases = ({ activeIndex, onSelect, openCaseSlug }: UseCasesProps) => {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [hoverSlideIndex, setHoverSlideIndex] = useState<number | null>(null);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
 
@@ -231,7 +230,7 @@ const UseCases = ({ activeIndex, onSelect, openCaseSlug }: UseCasesProps) => {
         ? '0 24px 60px rgba(0, 0, 0, 0.4)'
         : '0 18px 35px rgba(0, 0, 0, 0.3)';
     });
-  }, [isMobile]);
+  }, [isMobile, activeIndex]);
 
   useEffect(() => {
     animateDeck(activeIndex);
@@ -239,10 +238,16 @@ const UseCases = ({ activeIndex, onSelect, openCaseSlug }: UseCasesProps) => {
 
   useEffect(() => {
     if (!openCaseSlug) return;
-    setOpenSlug(openCaseSlug);
-    if (sectionRef.current) {
-      sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const timer = window.setTimeout(() => {
+      setOpenSlug(openCaseSlug);
+      if (sectionRef.current) {
+        sectionRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [openCaseSlug]);
 
   useEffect(() => {
@@ -292,8 +297,6 @@ const UseCases = ({ activeIndex, onSelect, openCaseSlug }: UseCasesProps) => {
           {SLIDES.map((slide, slideIndex) => {
             const position = getVisualPosition(slideIndex, activeIndex);
             const isFocused = position === 0;
-            const isHovered = hoverSlideIndex === slideIndex;
-            const layout = CARD_LAYOUT[position];
 
             return (
               <div
@@ -314,7 +317,6 @@ const UseCases = ({ activeIndex, onSelect, openCaseSlug }: UseCasesProps) => {
                   }}
                   onMouseEnter={() => {
                     if (isFocused) return;
-                    setHoverSlideIndex(slideIndex);
                     const wrapper = wrapperRefs.current[slideIndex];
                     if (!wrapper) return;
                     animate(wrapper, {
@@ -324,7 +326,6 @@ const UseCases = ({ activeIndex, onSelect, openCaseSlug }: UseCasesProps) => {
                     });
                   }}
                   onMouseLeave={() => {
-                    setHoverSlideIndex(null);
                     const wrapper = wrapperRefs.current[slideIndex];
                     if (!wrapper) return;
                     animate(wrapper, {

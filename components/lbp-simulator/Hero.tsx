@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { animate, splitText } from "animejs";
+import { useEffect, useRef } from 'react';
+import { animate, splitText } from 'animejs';
 
 export function Hero() {
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -17,16 +17,16 @@ export function Hero() {
       translateY: [24, 0],
       opacity: [0, 1],
       duration: 900,
-      easing: "easeOutExpo",
-      delay: (_el: any, index: number) => index * 40,
+      easing: 'easeOutExpo',
+      delay: (_el: unknown, index: number) => index * 40,
     });
 
     animate(subtitleSplit.words, {
       translateY: [18, 0],
       opacity: [0, 1],
       duration: 560,
-      easing: "easeOutExpo",
-      delay: (_el: any, index: number) => 160 + index * 28,
+      easing: 'easeOutExpo',
+      delay: (_el: unknown, index: number) => 160 + index * 28,
     });
   }, []);
 

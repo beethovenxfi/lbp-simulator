@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Custom hook to throttle a value
@@ -8,13 +8,21 @@ import { useEffect, useRef, useState } from "react";
  */
 export function useThrottle<T>(value: T, delay: number = 100): T {
   const [throttledValue, setThrottledValue] = useState<T>(value);
-  const lastRan = useRef<number>(Date.now());
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastRan = useRef<number>(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!initializedRef.current) {
+      lastRan.current = Date.now();
+      initializedRef.current = true;
+    }
+  }, []);
 
   useEffect(() => {
     // If delay is 0, return value immediately without throttling
     if (delay === 0) {
-      setThrottledValue(value);
+      window.setTimeout(() => setThrottledValue(value), 0);
       return;
     }
 
@@ -24,10 +32,10 @@ export function useThrottle<T>(value: T, delay: number = 100): T {
     }
 
     const timeSinceLastRun = Date.now() - lastRan.current;
-    
+
     if (timeSinceLastRun >= delay) {
       // Enough time has passed, update immediately
-      setThrottledValue(value);
+      window.setTimeout(() => setThrottledValue(value), 0);
       lastRan.current = Date.now();
     } else {
       // Schedule update for remaining time

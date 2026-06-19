@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { X, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useEffect, useState } from 'react';
+import { X, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export interface Toast {
   id: string;
@@ -31,7 +31,7 @@ function ToastItem({ toast, onClose }: ToastProps) {
   return (
     <div
       className={cn(
-        "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-lg border border-border bg-card p-4 pr-8 shadow-lg transition-all animate-in slide-in-from-bottom-5",
+        'group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-lg border border-border bg-card p-4 pr-8 shadow-lg transition-all animate-in slide-in-from-bottom-5',
       )}
     >
       <div className="flex items-start gap-3">
@@ -39,7 +39,9 @@ function ToastItem({ toast, onClose }: ToastProps) {
         <div className="grid gap-1 flex-1">
           <div className="text-sm font-semibold">{toast.title}</div>
           {toast.description && (
-            <div className="text-sm text-muted-foreground">{toast.description}</div>
+            <div className="text-sm text-muted-foreground">
+              {toast.description}
+            </div>
           )}
         </div>
       </div>
@@ -65,9 +67,15 @@ export function Toaster() {
       setToasts((prev) => [...prev, toast]);
     };
 
-    window.addEventListener("show-toast" as any, handleToast as EventListener);
+    window.addEventListener(
+      'show-toast' as unknown as keyof WindowEventMap,
+      handleToast as EventListener,
+    );
     return () => {
-      window.removeEventListener("show-toast" as any, handleToast as EventListener);
+      window.removeEventListener(
+        'show-toast' as unknown as keyof WindowEventMap,
+        handleToast as EventListener,
+      );
     };
   }, []);
 
@@ -86,7 +94,7 @@ export function Toaster() {
   );
 }
 
-export function toast(toastData: Omit<Toast, "id">) {
+export function toast(toastData: Omit<Toast, 'id'>) {
   const id = Math.random().toString(36).substring(2, 9);
   const toast: Toast = {
     ...toastData,
@@ -95,8 +103,8 @@ export function toast(toastData: Omit<Toast, "id">) {
   };
 
   window.dispatchEvent(
-    new CustomEvent("show-toast", {
+    new CustomEvent('show-toast', {
       detail: toast,
-    })
+    }),
   );
 }

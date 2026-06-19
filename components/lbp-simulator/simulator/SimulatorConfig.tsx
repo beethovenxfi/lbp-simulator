@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
@@ -13,39 +12,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Settings, Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import {
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/components/ui/sidebar';
+import { SidebarContent } from '@/components/ui/sidebar';
 import { useSimulatorStore } from '@/store/useSimulatorStore';
 import { DemandPressureConfig } from './DemandPressureConfig';
 import { SellPressureConfig } from './SellPressureConfig';
-import { useState, useEffect, useTransition, memo, useCallback } from 'react';
+import { useState, useEffect, useTransition, memo } from 'react';
 import { useDebounce } from '@/lib/useDebounce';
-import { LBPConfig } from '@/lib/lbp-math';
 import { useShallow } from 'zustand/shallow';
 import { TokenLogo } from '@/components/ui/TokenLogo';
 import { formatNumber } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 function SimulatorConfigComponent() {
-  const { setOpen, toggleSidebar } = useSidebar();
   const {
     config,
     updateConfig,
     isPlaying,
     setIsPlaying,
-    resetConfig,
-    restartSimulation,
     simulationSpeed,
     setSimulationSpeed,
     updateSellPressureConfig,
@@ -55,26 +40,13 @@ function SimulatorConfigComponent() {
       updateConfig: state.updateConfig,
       isPlaying: state.isPlaying,
       setIsPlaying: state.setIsPlaying,
-      resetConfig: state.resetConfig,
-      restartSimulation: state.restartSimulation,
       simulationSpeed: state.simulationSpeed,
       setSimulationSpeed: state.setSimulationSpeed,
       updateSellPressureConfig: state.updateSellPressureConfig,
     })),
   );
 
-  const [isPending, startTransition] = useTransition();
-
-  const handleSidebarClose = useCallback(() => {
-    setLocalDuration(config.duration);
-    setLocalTknWeightIn(config.tknWeightIn);
-    setLocalTknWeightOut(config.tknWeightOut);
-    setLocalPercentForSale(config.percentForSale);
-    setLocalTotalSupply(config.totalSupply);
-    setTotalSupplyInput(formatNumber(config.totalSupply));
-    setLocalUsdcBalanceIn(config.usdcBalanceIn);
-    setOpen(false);
-  }, [config, setOpen]);
+  const [, startTransition] = useTransition();
 
   // Local state for immediate UI updates (for sliders/inputs that trigger expensive recalculations)
   const [localDuration, setLocalDuration] = useState(config.duration);
@@ -98,13 +70,16 @@ function SimulatorConfigComponent() {
 
   // Update local state when store config changes
   useEffect(() => {
-    setLocalDuration(config.duration);
-    setLocalTknWeightIn(config.tknWeightIn);
-    setLocalTknWeightOut(config.tknWeightOut);
-    setLocalPercentForSale(config.percentForSale);
-    setLocalTotalSupply(config.totalSupply);
-    setTotalSupplyInput(formatNumber(config.totalSupply));
-    setLocalUsdcBalanceIn(config.usdcBalanceIn);
+    const timer = window.setTimeout(() => {
+      setLocalDuration(config.duration);
+      setLocalTknWeightIn(config.tknWeightIn);
+      setLocalTknWeightOut(config.tknWeightOut);
+      setLocalPercentForSale(config.percentForSale);
+      setLocalTotalSupply(config.totalSupply);
+      setTotalSupplyInput(formatNumber(config.totalSupply));
+      setLocalUsdcBalanceIn(config.usdcBalanceIn);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [
     config.duration,
     config.tknWeightIn,

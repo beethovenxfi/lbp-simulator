@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { memo } from "react";
-import { useSimulatorStore } from "@/store/useSimulatorStore";
-import { useDisplayStep } from "@/lib/hooks/useDisplayStep";
-import { PriceChartTab } from "./tabs/PriceChartTab";
+import { memo } from 'react';
+import { useSimulatorStore } from '@/store/useSimulatorStore';
+import { useDisplayStep } from '@/lib/hooks/useDisplayStep';
+import { PriceChartTab } from './tabs/PriceChartTab';
+import type { ChartDataItem } from './SimulatorChartArea';
 
 interface PriceChartWithAnimationProps {
-  chartData: any[];
+  chartData: ChartDataItem[];
   priceDomain: [number, number] | undefined;
-  simulationData: any[];
   isPlaying: boolean;
   shouldAnimate: boolean;
 }
@@ -20,7 +20,6 @@ interface PriceChartWithAnimationProps {
 function PriceChartWithAnimationComponent({
   chartData,
   priceDomain,
-  simulationData,
   isPlaying,
   shouldAnimate,
 }: PriceChartWithAnimationProps) {
@@ -34,7 +33,7 @@ function PriceChartWithAnimationComponent({
     simulationSpeed,
     totalSteps,
     currentStep,
-    setCurrentStep
+    setCurrentStep,
   );
 
   return (
@@ -42,7 +41,6 @@ function PriceChartWithAnimationComponent({
       chartData={chartData}
       isPlaying={isPlaying}
       shouldAnimate={shouldAnimate}
-      simulationData={simulationData}
       currentStep={displayStep}
       priceDomain={priceDomain}
     />

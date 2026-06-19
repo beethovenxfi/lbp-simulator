@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 import type {
   LBPConfig,
   DemandPressureConfig,
   SellPressureConfig,
-} from "../lbp-math";
+} from '../lbp-math';
 
 // Helper to create stable string representation for comparison
 function createConfigKey(config: LBPConfig): string {
@@ -53,7 +53,7 @@ interface StartState {
 }
 
 interface WorkerMessage {
-  type: "calculate";
+  type: 'calculate';
   config: LBPConfig;
   demandPressureConfig: DemandPressureConfig;
   sellPressureConfig: SellPressureConfig;
@@ -64,7 +64,7 @@ interface WorkerMessage {
 }
 
 interface WorkerResponse {
-  type: "success" | "error";
+  type: 'success' | 'error';
   result?: number[][];
   error?: string;
 }
@@ -84,44 +84,44 @@ export function usePricePathsWorker(
   const [error, setError] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const requestIdRef = useRef<number>(0);
-  const lastConfigKeyRef = useRef<string>("");
-  const lastDemandConfigKeyRef = useRef<string>("");
-  const lastSellConfigKeyRef = useRef<string>("");
+  const lastConfigKeyRef = useRef<string>('');
+  const lastDemandConfigKeyRef = useRef<string>('');
+  const lastSellConfigKeyRef = useRef<string>('');
   const lastStepsRef = useRef<number>(-1);
   const lastEnabledRef = useRef<boolean>(false);
   const currentStepRef = useRef<number>(0);
-  const lastStartStateKeyRef = useRef<string>("");
+  const lastStartStateKeyRef = useRef<string>('');
 
   // Initialize worker
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     try {
       // Create worker from the public folder
-      workerRef.current = new Worker("/workers/pricePathsWorker.js", {
-        type: "module",
+      workerRef.current = new Worker('/workers/pricePathsWorker.js', {
+        type: 'module',
       });
 
       workerRef.current.onmessage = (e: MessageEvent<WorkerResponse>) => {
         const { type, result, error: errorMsg } = e.data;
-        if (type === "success" && result) {
+        if (type === 'success' && result) {
           setPaths(result);
           setIsLoading(false);
           setError(null);
-        } else if (type === "error") {
-          setError(errorMsg || "Unknown error");
+        } else if (type === 'error') {
+          setError(errorMsg || 'Unknown error');
           setIsLoading(false);
         }
       };
 
       workerRef.current.onerror = (err) => {
-        setError("Worker error occurred");
+        setError('Worker error occurred');
         setIsLoading(false);
-        console.error("Worker error:", err);
+        console.error('Worker error:', err);
       };
     } catch (err) {
-      console.error("Failed to create worker:", err);
-      setError("Failed to initialize worker");
+      console.error('Failed to create worker:', err);
+      window.setTimeout(() => setError('Failed to initialize worker'), 0);
     }
 
     return () => {
@@ -139,7 +139,7 @@ export function usePricePathsWorker(
     const sellConfigKey = createSellConfigKey(sellPressureConfig);
     const startStateKey = currentStepState
       ? JSON.stringify(currentStepState)
-      : "";
+      : '';
 
     // Only recalculate if something actually changed
     if (
@@ -164,18 +164,22 @@ export function usePricePathsWorker(
     lastStartStateKeyRef.current = startStateKey;
 
     if (!enabled || !workerRef.current) {
-      setPaths([]);
-      setIsLoading(false);
+      window.setTimeout(() => {
+        setPaths([]);
+        setIsLoading(false);
+      }, 0);
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    window.setTimeout(() => {
+      setIsLoading(true);
+      setError(null);
+    }, 0);
     requestIdRef.current += 1;
     const currentRequestId = requestIdRef.current;
 
     const message: WorkerMessage = {
-      type: "calculate",
+      type: 'calculate',
       config,
       demandPressureConfig,
       sellPressureConfig,
@@ -190,7 +194,7 @@ export function usePricePathsWorker(
     // Timeout check to ensure we don't wait forever
     const timeoutId = setTimeout(() => {
       if (currentRequestId === requestIdRef.current) {
-        setError("Calculation timeout");
+        setError('Calculation timeout');
         setIsLoading(false);
       }
     }, 30000); // 30 second timeout

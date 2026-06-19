@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 import type {
   LBPConfig,
   DemandPressureConfig,
   SellPressureConfig,
-} from "../lbp-math";
-import type { SimulationStateSnapshot } from "../simulation-core";
+} from '../lbp-math';
+import type { SimulationStateSnapshot } from '../simulation-core';
 
 interface WorkerMessage {
-  type: "run-simulation";
+  type: 'run-simulation';
   config: LBPConfig;
   demandPressureConfig: DemandPressureConfig;
   sellPressureConfig: SellPressureConfig;
@@ -15,7 +15,7 @@ interface WorkerMessage {
 }
 
 interface WorkerResponse {
-  type: "success" | "error";
+  type: 'success' | 'error';
   result?: SimulationStateSnapshot[];
   error?: string;
 }
@@ -69,40 +69,43 @@ export function useSimulationWorker(
   const [error, setError] = useState<string | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const requestIdRef = useRef(0);
-  const lastConfigKeyRef = useRef("");
-  const lastDemandKeyRef = useRef("");
-  const lastSellKeyRef = useRef("");
+  const lastConfigKeyRef = useRef('');
+  const lastDemandKeyRef = useRef('');
+  const lastSellKeyRef = useRef('');
   const lastStepsRef = useRef(-1);
   const lastEnabledRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     try {
-      workerRef.current = new Worker("/workers/simulationWorker.js", {
-        type: "module",
+      workerRef.current = new Worker('/workers/simulationWorker.js', {
+        type: 'module',
       });
 
       workerRef.current.onmessage = (e: MessageEvent<WorkerResponse>) => {
         const { type, result, error: errorMsg } = e.data;
-        if (type === "success" && result) {
+        if (type === 'success' && result) {
           setSnapshots(result);
           setIsLoading(false);
           setError(null);
-        } else if (type === "error") {
-          setError(errorMsg || "Unknown simulation error");
+        } else if (type === 'error') {
+          setError(errorMsg || 'Unknown simulation error');
           setIsLoading(false);
         }
       };
 
       workerRef.current.onerror = (err) => {
-        console.error("Simulation worker error:", err);
-        setError("Simulation worker error");
+        console.error('Simulation worker error:', err);
+        setError('Simulation worker error');
         setIsLoading(false);
       };
     } catch (err) {
-      console.error("Failed to create simulation worker:", err);
-      setError("Failed to initialize simulation worker");
+      console.error('Failed to create simulation worker:', err);
+      window.setTimeout(
+        () => setError('Failed to initialize simulation worker'),
+        0,
+      );
     }
 
     return () => {
@@ -135,18 +138,22 @@ export function useSimulationWorker(
     lastEnabledRef.current = enabled;
 
     if (!enabled || !workerRef.current) {
-      setSnapshots([]);
-      setIsLoading(false);
+      window.setTimeout(() => {
+        setSnapshots([]);
+        setIsLoading(false);
+      }, 0);
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    window.setTimeout(() => {
+      setIsLoading(true);
+      setError(null);
+    }, 0);
     requestIdRef.current += 1;
     const currentRequestId = requestIdRef.current;
 
     const message: WorkerMessage = {
-      type: "run-simulation",
+      type: 'run-simulation',
       config,
       demandPressureConfig,
       sellPressureConfig,
@@ -157,7 +164,7 @@ export function useSimulationWorker(
 
     const timeoutId = setTimeout(() => {
       if (currentRequestId === requestIdRef.current) {
-        setError("Simulation timeout");
+        setError('Simulation timeout');
         setIsLoading(false);
       }
     }, 30000);
@@ -169,4 +176,3 @@ export function useSimulationWorker(
 
   return { snapshots, isLoading, error };
 }
-

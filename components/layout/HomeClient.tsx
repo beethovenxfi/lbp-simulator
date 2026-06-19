@@ -7,7 +7,6 @@ import { Hero } from '@/components/lbp-simulator/Hero';
 import UseCases from '@/components/layout/UseCases';
 import { Live } from '@/components/layout/Live';
 import { Insights } from '@/components/layout/Insights';
-import { KPI } from '@/components/layout/KPI';
 import { CommonQuestions } from '@/components/layout/CommonQuestions';
 
 type HomeClientProps = {
@@ -22,13 +21,16 @@ export function HomeClient({ initialCase }: HomeClientProps) {
   useEffect(() => {
     const caseParam = searchParams.get('case') ?? initialCase;
     if (!caseParam) return;
-    setOpenCase(caseParam);
-    const index = ['buy-back', 'token-launches', 'divestment'].indexOf(
-      caseParam,
-    );
-    if (index >= 0) {
-      setActiveUseCase(index);
-    }
+    const timer = window.setTimeout(() => {
+      setOpenCase(caseParam);
+      const index = ['buy-back', 'token-launches', 'divestment'].indexOf(
+        caseParam,
+      );
+      if (index >= 0) {
+        setActiveUseCase(index);
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [initialCase, searchParams]);
 
   return (

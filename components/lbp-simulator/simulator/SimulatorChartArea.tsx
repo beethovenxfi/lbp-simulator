@@ -12,6 +12,12 @@ import { SwapsTab } from './tabs/SwapsTab';
 import { DemandChartTab } from './tabs/DemandChartTab';
 import { WeightsChartTab } from './tabs/WeightsChartTab';
 
+export interface ChartDataItem {
+  index: number;
+  price: number;
+  [key: string]: unknown;
+}
+
 /**
  * Isolated component that subscribes only to step-changing / chart-related store state.
  * Re-renders every step; parent SimulatorMain does not, so SwapForm and tab triggers stay stable.
@@ -20,15 +26,12 @@ function SimulatorChartAreaComponent() {
   const {
     simulationData,
     priceHistory,
-    priceHistoryVersion,
     baseSnapshots,
-    baseSnapshotsVersion,
     swaps,
     demandPressureCurve,
     sellPressureCurve,
     config,
     currentStep,
-    simulationSpeed,
     demandPressureConfig,
     sellPressureConfig,
     isPlaying,
@@ -74,33 +77,27 @@ function SimulatorChartAreaComponent() {
   }, [isPlaying]);
 
   const fullChartData = useMemo(() => {
-    const out: any[] = [];
+    const out: ChartDataItem[] = [];
     const source = baseSnapshots.length > 0 ? baseSnapshots : simulationData;
     const n = source.length;
     if (n === 0) return out;
     for (let i = 0; i < n; i++) {
-      const base = source[i] as any;
+      const base = source[i] as unknown as ChartDataItem;
       const priceInCollateral = priceHistory[i] ?? base.price;
       out.push({
-        index: i,
         ...base,
+        index: i,
         price: priceInCollateral * collateralUsd,
       });
     }
     return out;
-  }, [
-    simulationData,
-    baseSnapshots,
-    baseSnapshotsVersion,
-    priceHistoryVersion,
-    collateralUsd,
-  ]);
+  }, [simulationData, baseSnapshots, priceHistory, collateralUsd]);
 
   const priceDomain = useMemo((): [number, number] | undefined => {
     if (fullChartData.length === 0) return undefined;
     const prices = fullChartData
-      .map((d: any) => d.price)
-      .filter((p: any) => typeof p === 'number' && !Number.isNaN(p));
+      .map((d) => d.price)
+      .filter((p): p is number => typeof p === 'number' && !Number.isNaN(p));
     if (prices.length === 0) return undefined;
     const minP = Math.min(...prices);
     const maxP = Math.max(...prices);
@@ -112,7 +109,7 @@ function SimulatorChartAreaComponent() {
   const chartData = useMemo(() => {
     if (effectiveIsPlaying) {
       const sampleEvery = 10;
-      const out: any[] = [];
+      const out: ChartDataItem[] = [];
       for (let i = 0; i < fullChartData.length; i += sampleEvery) {
         out.push(fullChartData[i]);
       }
@@ -136,11 +133,13 @@ function SimulatorChartAreaComponent() {
   const debouncedDemandPressureConfig = useDebounce(demandPressureConfig, 500);
   const [shouldCalculatePaths, setShouldCalculatePaths] = useState(!isPlaying);
   useEffect(() => {
-    if (!isPlaying) {
-      const timer = setTimeout(() => setShouldCalculatePaths(true), 100);
-      return () => clearTimeout(timer);
-    }
-    setShouldCalculatePaths(false);
+    const timer = setTimeout(
+      () => {
+        setShouldCalculatePaths(!isPlaying);
+      },
+      isPlaying ? 0 : 100,
+    );
+    return () => clearTimeout(timer);
   }, [isPlaying]);
 
   // Build the current-step state for the worker so that potential
@@ -180,7 +179,7 @@ function SimulatorChartAreaComponent() {
 
     const startIndex = currentStep;
 
-    return fullChartData.map((data: any, i: number) => {
+    return fullChartData.map((data, i: number) => {
       const localIdx = i - startIndex;
       let low = localIdx >= 0 ? potentialPaths[0]?.[localIdx] : null;
       let med = localIdx >= 0 ? potentialPaths[1]?.[localIdx] : null;
@@ -193,7 +192,7 @@ function SimulatorChartAreaComponent() {
       // For the junction, we anchor all three potential paths to the
       // current spot price so the solid and dashed lines meet.
       if (localIdx === 0) {
-        const priceInCollateral = data.price / collateralUsd;
+        const priceInCollateral = (data as ChartDataItem).price / collateralUsd;
         low = priceInCollateral;
         med = priceInCollateral;
         high = priceInCollateral;
@@ -217,12 +216,13 @@ function SimulatorChartAreaComponent() {
   ]);
 
   const demandChartData = useMemo(() => {
-    return throttledChartData.map((d: any) => {
-      const idx = d.index ?? 0;
+    return throttledChartData.map((d) => {
+      const record = d as ChartDataItem;
+      const idx = record.index ?? 0;
       const buy = demandPressureCurve[idx] ?? 0;
       const sell = sellPressureCurve[idx] ?? 0;
       return {
-        ...d,
+        ...record,
         buyPressure: buy,
         sellPressure: sell,
         netPressure: buy - sell,
@@ -236,7 +236,6 @@ function SimulatorChartAreaComponent() {
         <PriceChartWithAnimation
           chartData={fullChartDataWithPaths}
           priceDomain={priceDomain}
-          simulationData={simulationData}
           isPlaying={effectiveIsPlaying}
           shouldAnimate={shouldAnimate}
         />
