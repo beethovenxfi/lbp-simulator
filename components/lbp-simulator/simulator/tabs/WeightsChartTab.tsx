@@ -26,10 +26,13 @@ function WeightsChartTabComponent({
 }: WeightsChartTabProps) {
   const axisLabelColor = '#b3b3b3';
 
-  const referenceTimeLabel = useMemo(() => {
+  const referenceTimeLabel = useMemo<string | number | null>(() => {
     if (chartData.length === 0 || currentStep < 0) return null;
     const point = chartData.filter((d) => (d.index ?? 0) <= currentStep).pop();
-    return point?.timeLabel ?? null;
+    const label = point?.timeLabel;
+    if (label == null) return null;
+    if (typeof label === 'string' || typeof label === 'number') return label;
+    return null;
   }, [chartData, currentStep]);
 
   return (
