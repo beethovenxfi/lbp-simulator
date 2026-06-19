@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 
 const STEP_MS = 500; // same as store interval: 500 / speed gives ms per step
 
@@ -15,13 +15,22 @@ export function useDisplayStep(
   simulationSpeed: number,
   totalSteps: number,
   currentStep: number,
-  setCurrentStep: (step: number) => void
+  setCurrentStep: (step: number) => void,
 ): number {
-  const [, setTick] = useState(0);
+  const [displayStep, setDisplayStep] = useState(currentStep);
   const displayStepRef = useRef(currentStep);
   const lastStoreStepRef = useRef(currentStep);
-  const lastStoreStepTimeRef = useRef(performance.now());
+  const lastStoreStepTimeRef = useRef(0);
+  const initializedRef = useRef(false);
   const rafRef = useRef<number | null>(null);
+
+  // Initialize timing ref on mount
+  useEffect(() => {
+    if (!initializedRef.current) {
+      lastStoreStepTimeRef.current = performance.now();
+      initializedRef.current = true;
+    }
+  }, []);
 
   // Sync refs when store currentStep changes (e.g. from tick() or pause)
   useEffect(() => {
@@ -55,12 +64,12 @@ export function useDisplayStep(
       const stepsSinceLastStoreUpdate = elapsed / stepDurationMs;
       const raw =
         lastStoreStepRef.current + Math.min(stepsSinceLastStoreUpdate, 1);
-      const displayStep = Math.min(
+      const nextDisplayStep = Math.min(
         Math.max(0, totalSteps - 1),
-        Math.max(0, raw)
+        Math.max(0, raw),
       );
-      displayStepRef.current = displayStep;
-      setTick((t) => t + 1);
+      displayStepRef.current = nextDisplayStep;
+      setDisplayStep(nextDisplayStep);
       rafRef.current = requestAnimationFrame(onFrame);
     };
 
@@ -71,10 +80,10 @@ export function useDisplayStep(
         rafRef.current = null;
       }
     };
-  }, [isPlaying, stepDurationMs, totalSteps]);
+  }, [isPlaying, stepDurationMs, totalSteps, currentStep]);
 
   if (!isPlaying) {
     return currentStep;
   }
-  return displayStepRef.current;
+  return displayStep;
 }

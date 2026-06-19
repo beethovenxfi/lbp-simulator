@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   LineChart,
   Line,
@@ -8,14 +8,14 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-} from "recharts";
-import { memo, useMemo } from "react";
+} from 'recharts';
+import { memo, useMemo } from 'react';
+import type { ChartDataItem } from '../SimulatorChartArea';
 
 interface PriceChartTabProps {
-  chartData: any[];
+  chartData: ChartDataItem[];
   isPlaying: boolean;
   shouldAnimate: boolean;
-  simulationData: any[];
   /** Step up to which to reveal the line (use displayStep when provided for smooth animation) */
   currentStep: number;
   /** Fixed Y domain [min, max] from full series to avoid axis jumps. Optional: falls back to "auto". */
@@ -26,11 +26,10 @@ function PriceChartTabComponent({
   chartData,
   isPlaying,
   shouldAnimate,
-  simulationData,
   currentStep,
   priceDomain,
 }: PriceChartTabProps) {
-const axisLabelColor = "#b3b3b3";
+  const axisLabelColor = '#b3b3b3';
 
   const displayData = useMemo(() => {
     const step = currentStep ?? 0;
@@ -53,7 +52,7 @@ const axisLabelColor = "#b3b3b3";
 
   const yAxisDomain = priceDomain
     ? [priceDomain[0], priceDomain[1]]
-    : (["auto", "auto"] as const);
+    : (['auto', 'auto'] as const);
 
   return (
     <>
@@ -85,41 +84,41 @@ const axisLabelColor = "#b3b3b3";
           />
           <Tooltip
             contentStyle={{
-              borderRadius: "8px",
-              border: "1px solid hsl(var(--border))",
-              backgroundColor: "hsl(var(--popover))",
-              color: "hsl(var(--popover-foreground))",
+              borderRadius: '8px',
+              border: '1px solid hsl(var(--border))',
+              backgroundColor: 'hsl(var(--popover))',
+              color: 'hsl(var(--popover-foreground))',
             }}
-            itemStyle={{ color: "hsl(var(--foreground))" }}
+            itemStyle={{ color: 'hsl(var(--foreground))' }}
             labelStyle={{
-              color: "hsl(var(--muted-foreground))",
-              marginBottom: "0.25rem",
+              color: 'hsl(var(--muted-foreground))',
+              marginBottom: '0.25rem',
             }}
-            formatter={(value: any, name?: any) => {
-              if (value == null) return "";
+            formatter={(value: string | number | undefined, name?: string) => {
+              if (value == null) return '';
               const labels: Record<string, string> = {
-                price: "Spot price",
-                potentialPathLow: "Low path",
-                potentialPathMedium: "Medium path",
-                potentialPathHigh: "High path",
+                price: 'Spot price',
+                potentialPathLow: 'Low path',
+                potentialPathMedium: 'Medium path',
+                potentialPathHigh: 'High path',
               };
-              const label = name ? labels[name] || name : "Price";
+              const label = name ? labels[name] || name : 'Price';
               return [`$${Number(value).toFixed(4)}`, label];
             }}
           />
           <Legend
             wrapperStyle={{
-              paddingTop: "20px",
-              paddingBottom: "10px",
-              fontSize: "12px",
+              paddingTop: '20px',
+              paddingBottom: '10px',
+              fontSize: '12px',
             }}
             iconType="line"
             formatter={(value) => {
               const labels: Record<string, string> = {
-                price: "Spot price",
-                potentialPathLow: "Potential path (zero demand)",
-                potentialPathMedium: "Potential path (medium demand)",
-                potentialPathHigh: "Potential path (high demand)",
+                price: 'Spot price',
+                potentialPathLow: 'Potential path (zero demand)',
+                potentialPathMedium: 'Potential path (medium demand)',
+                potentialPathHigh: 'Potential path (high demand)',
               };
               return labels[value] || value;
             }}
@@ -166,7 +165,7 @@ const axisLabelColor = "#b3b3b3";
             stroke="url(#demand-pressure-gradient)"
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 6, fill: "url(#demand-pressure-gradient)" }}
+            activeDot={{ r: 6, fill: 'url(#demand-pressure-gradient)' }}
             isAnimationActive={shouldAnimate}
             animationDuration={shouldAnimate ? 300 : 0}
             name="price"

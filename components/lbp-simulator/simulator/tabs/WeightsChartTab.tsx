@@ -10,9 +10,10 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { memo, useMemo } from 'react';
+import type { ChartDataItem } from '../SimulatorChartArea';
 
 interface WeightsChartTabProps {
-  chartData: any[];
+  chartData: ChartDataItem[];
   shouldAnimate: boolean;
   /** Current simulation step; used to draw reference line for "now" */
   currentStep: number;
@@ -25,10 +26,13 @@ function WeightsChartTabComponent({
 }: WeightsChartTabProps) {
   const axisLabelColor = '#b3b3b3';
 
-  const referenceTimeLabel = useMemo(() => {
+  const referenceTimeLabel = useMemo<string | number | null>(() => {
     if (chartData.length === 0 || currentStep < 0) return null;
     const point = chartData.filter((d) => (d.index ?? 0) <= currentStep).pop();
-    return point?.timeLabel ?? null;
+    const label = point?.timeLabel;
+    if (label == null) return null;
+    if (typeof label === 'string' || typeof label === 'number') return label;
+    return null;
   }, [chartData, currentStep]);
 
   return (
@@ -105,7 +109,10 @@ function WeightsChartTabComponent({
               color: 'hsl(var(--muted-foreground))',
               marginBottom: '0.25rem',
             }}
-            formatter={(value: any, name: any) => [
+            formatter={(
+              value: string | number | undefined,
+              name: string | undefined,
+            ) => [
               `${Number(value).toFixed(2)}%`,
               name === 'tknWeight' ? 'Token' : 'USDC',
             ]}

@@ -162,7 +162,7 @@ function DemandPressureConfigComponent() {
                       }}
                     />
                     <Tooltip
-                      formatter={(value: any) => {
+                      formatter={(value: string | number | undefined) => {
                         if (value == null) return '';
                         return `${Number(value).toLocaleString()} ${config.collateralToken}`;
                       }}

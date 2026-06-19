@@ -190,7 +190,6 @@ describe('LBP Math Invariants', () => {
 
   describe('Weight schedule', () => {
     it('LBP weight should interpolate linearly in time', () => {
-      const duration = 48;
       const steps = 100;
       const tknWeightIn = 90;
       const tknWeightOut = 10;

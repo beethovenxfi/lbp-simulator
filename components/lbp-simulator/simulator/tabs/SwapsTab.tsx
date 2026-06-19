@@ -3,9 +3,10 @@
 import { memo } from 'react';
 import { useSimulatorStore } from '@/store/useSimulatorStore';
 import { useShallow } from 'zustand/react/shallow';
+import type { Swap } from '@/store/useSimulatorStore';
 
 interface SwapsTabProps {
-  swaps: any[];
+  swaps: Swap[];
 }
 
 function SwapsTabComponent({ swaps }: SwapsTabProps) {

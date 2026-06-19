@@ -152,8 +152,8 @@ function SellPressureConfigComponent() {
                         tickFormatter={(val) => `${val.toFixed(0)}%`}
                       />
                       <Tooltip
-                        formatter={(value: any) =>
-                          value != null ? `${value.toFixed(2)}%` : ''
+                        formatter={(value: string | number | undefined) =>
+                          value != null ? `${Number(value).toFixed(2)}%` : ''
                         }
                         labelFormatter={(label) =>
                           `Time: ${Number(label).toFixed(1)}h`

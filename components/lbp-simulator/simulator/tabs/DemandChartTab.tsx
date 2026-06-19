@@ -10,8 +10,10 @@ import {
 } from 'recharts';
 import { memo } from 'react';
 
+import type { ChartDataItem } from '../SimulatorChartArea';
+
 interface DemandChartTabProps {
-  chartData: any[];
+  chartData: ChartDataItem[];
   shouldAnimate: boolean;
 }
 
@@ -45,7 +47,10 @@ function DemandChartTabComponent({
             tick={{ fill: axisLabelColor }}
           />
           <Tooltip
-            formatter={(value: any, name: any) => {
+            formatter={(
+              value: string | number | undefined,
+              name: string | undefined,
+            ) => {
               const labelMap: Record<string, string> = {
                 buyPressure: 'Buy pressure (USDC/step)',
                 sellPressure: 'Sell pressure (USDC/step)',
